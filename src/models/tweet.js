@@ -5,7 +5,7 @@ var Schema = mongoose.Schema;
 
 var TweetSchema = Schema({
     contenido: String,
-    user: { type: Schema.ObjectId, ref: 'user' }
+    user: String
 })
 
 module.exports = mongoose.model('tweet', TweetSchema)

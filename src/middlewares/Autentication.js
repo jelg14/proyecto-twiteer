@@ -13,8 +13,9 @@ exports.ensureAuth = function(req, res, next) {
     var entrada = array_de_c[0].toUpperCase()
     var Usuario = require('../models/usuario');
 
-    if (!req.headers.authorization && entrada == "PORFILE" || entrada == "FOLLOW") {
-        return res.status(400).send("no posee cabezera de autorizacion")
+
+    if (!req.headers.authorization && entrada == "PORFILE") {
+        return res.status(400).send("no posee cabezera de autorizacion " + req.headers.authorization)
     } else if (entrada == "LOGIN" || entrada == "REGISTER") {
         if (entrada == "REGISTER" && array_de_c.length == 3) {
             var username = array_de_c[1]
@@ -76,7 +77,7 @@ exports.ensureAuth = function(req, res, next) {
                 }
             })
         }
-    } else {
+    } else if (req.headers.authorization) {
 
         var token = req.headers.authorization.replace(/['"]+/g, '');
         try {

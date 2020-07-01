@@ -6,7 +6,10 @@ var Schema = mongoose.Schema;
 var UsuarioSchema = Schema({
     usuario: String,
     password: String,
-    UsuariosALosQueSigue: []
+    numeroDetweets: Number,
+    seguidores: []
+
+
 })
 
 module.exports = mongoose.model('usuario', UsuarioSchema);

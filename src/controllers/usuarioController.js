@@ -38,7 +38,7 @@ function commands(req, res) {
             return res.status(500).send("ERROR")
         }
 
-        Usuario.update({ usuario: username }, { $addToSet: { seguidores: req.user.usuario } }, { new: true }, (err, siguiendo) => {
+        Usuario.updateMany({ usuario: username }, { $addToSet: { seguidores: req.user.usuario } }, { new: true }, (err, siguiendo) => {
             if (err) return res.status(500).send({ message: "Error en la peticion para seguir +" + err })
             if (!siguiendo) return res.status(404).send({ message: "Ocurrio un error en el transcurso de la peticion" })
 

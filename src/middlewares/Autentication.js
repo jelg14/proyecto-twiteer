@@ -17,7 +17,7 @@ exports.ensureAuth = function(req, res, next) {
     if (!req.headers.authorization && entrada == "PORFILE") {
         return res.status(400).send("no posee cabezera de autorizacion " + req.headers.authorization)
     } else if (entrada == "LOGIN" || entrada == "REGISTER") {
-        if (entrada == "REGISTER" && array_de_c.length == 3) {
+        if (entrada == "REGISTER") {
             var username = array_de_c[1]
             var password = array_de_c[2]
 
@@ -48,7 +48,7 @@ exports.ensureAuth = function(req, res, next) {
                     })
                 }
             })
-        } else if (entrada == "LOGIN" && array_de_c.length == 3) {
+        } else if (entrada == "LOGIN") {
             var nombre = array_de_c[1];
             var password = array_de_c[2]
 

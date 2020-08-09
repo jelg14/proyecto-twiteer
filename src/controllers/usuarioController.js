@@ -2,7 +2,6 @@
 var Usuario = require('../models/usuario');
 var Tweet = require('../models/tweet');
 var Retweet = require('../models/retweet')
-var ViewTweet = require('../models/viewTweet')
 
 function commands(req, res) {
     var c = req.body.commands;
@@ -15,7 +14,7 @@ function commands(req, res) {
         var username = array_de_c[1];
 
 
-        Usuario.find(({ usuario: username }), (err, usuario) => {
+        Usuario.find({ usuario: username }, (err, usuario) => {
             if (err) return res.status(500).send({ message: "error en la peticion" })
             if (!usuario) return res.status(404).send({ message: "no fue posible encontrar el perfil que solicita" })
 
@@ -46,7 +45,7 @@ function commands(req, res) {
             return res.status(200).send({ Siguiendo_a: siguiendo })
         })
 
-    } else if (entrada == "VIEW_TWEETS" /*modificar */ ) {
+    } else if (entrada == "VIEW_TWEETS") {
         Tweet.find({ usuario: array_de_c[1] }, { usuario: 1, contenido: 1, cantidad_de_likes: 1, comentarios: 1, compartido: 1 }, (err, tweets) => {
             if (err) return res.status(500).send({ message: "error en la peticion de tweet =>" + err })
             if (!tweets) return res.status(500).send({ message: "error al listar los tweets=>" + req.user.sub })
@@ -58,7 +57,7 @@ function commands(req, res) {
         var idTweet = array_de_c[1]
         var primero = array_de_c.shift();
         var segundo = array_de_c.shift();
-        var nuevo = array_de_c.join();
+        var nuevo = array_de_c.join(' ');
         Tweet.findById(idTweet, (err, buscando) => {
             if (err) return res.status(500).send({ message: "Ocurrio un error durante el proceso" })
             if (!buscando) return res.status(404).send({ message: "No fue encontrado el tweet" })
@@ -76,7 +75,7 @@ function commands(req, res) {
             }
         })
 
-    } else if (entrada == "DELETE_TWEET" && array_de_c.length == 2) {
+    } else if (entrada == "DELETE_TWEET") {
         var idTweet = array_de_c[1]
 
         Tweet.findById(idTweet, (err, tweetEliminado) => {
@@ -93,7 +92,7 @@ function commands(req, res) {
 
         })
 
-    } else if (entrada == "ADD_TWEET" && array_de_c.length >= 2) {
+    } else if (entrada == "ADD_TWEET") {
         var tweet = new Tweet();
 
         if (array_de_c.length) {
@@ -107,13 +106,13 @@ function commands(req, res) {
                 tweet.save((err, tweetCreado) => {
                     if (err) return res.status(500).send({ message: 'Error en la peticion de tweet =>' + err });
                     if (!tweetCreado) return res.status(404).send({ message: 'Error al agregar tweet' });
-
+                    console.log(tweetCreado.contenido);
                     return res.status(200).send({ tweet: tweetCreado });
                 })
         } else {
             return res.status(500).send({ message: "No puede agregar un tweet vacio" })
         }
-    } else if (entrada == "LIKE") {
+    } else if (entrada == "LIKE_TWEET") {
         var idTweet = array_de_c[1];
 
         Tweet.findByIdAndUpdate(idTweet, { $addToSet: { likes: req.user.usuario }, $inc: { cantidad_de_likes: 1 } }, { new: true }, (err, like) => {
@@ -123,7 +122,7 @@ function commands(req, res) {
 
             return res.status(200).send({ like_a: like })
         })
-    } else if (entrada == "DISLIKE") {
+    } else if (entrada == "DISLIKE_TWEET") {
         var idTweet = array_de_c[1];
 
         Tweet.findByIdAndUpdate(idTweet, { $pull: { likes: req.user.usuario }, $inc: { cantidad_de_likes: -1 } }, { new: true }, (err, like) => {
@@ -138,13 +137,15 @@ function commands(req, res) {
         var segundo = array_de_c.shift()
         var opinion = array_de_c.join(' ')
 
-        if (array_de_c) {
+        if (array_de_c != 0) {
             Tweet.findByIdAndUpdate(idTweet, { $push: { listaComentarios: { usuario: req.user.usuario, comentario: opinion } }, $inc: { comentarios: 1 } }, { new: true }, (err, comentarioCreado) => {
                 if (err) return res.status(500).send({ message: 'Error en la peticion' })
                 if (!comentarioCreado) return res.status(404).send({ message: "El tweet ya no existe" })
 
                 return res.status(200).send({ Comentario: comentarioCreado })
             })
+        } else {
+            return res.status(500).send({ message: "No puede ingresar un comentario vacio" })
         }
 
     } else if (entrada == "RETWEET") {
